@@ -1,0 +1,100 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Chat - Bruno</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-GLhlTQ8iRABdZLl6O3oVMWSktQOp6b7In1Zl3/Jr59b6EGGoI1aFkw7cmDA6j6gD" crossorigin="anonymous">
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/js/bootstrap.bundle.min.js" integrity="sha384-w76AqPfDkMBDXo30jS1Sgez6pr3x5MlQ1ZAGC+nuZB+EYdgRZgiwxhTBTkF7CXvN" crossorigin="anonymous"></script>
+    <link rel="stylesheet" type="text/css" href="style.css">
+
+</head>
+<body>
+        
+    <div id="caixaMensagens">
+
+        <ul id="mensagens"></ul>
+        <form>
+            <input id="nome" placeholder="Seu Nome de Usuario">
+            <div id="enviarMensagem">
+                <input id="mensagem" placeholder="Sua Mensagem">
+            </div>
+            <button>Enviar</button>
+        </form>
+    </div>
+
+    <!-- Importar o Script do Socket -->
+
+    <script src="/socket.io/socket.io.js"></script>
+    <script>
+
+        //Criar uma instancia do Socket.io
+        const socket = io()
+
+        //Selecione o input nome
+        const nomeInput = document.getElementById('nome');
+
+        //Selecione o input nome
+        const mensagemInput = document.getElementById('mensagem');
+
+        //Selecione o input nome
+        const mensagensInput = document.getElementById('mensagens');
+
+        let currentUser;
+
+        //Adiciona um evento para o envio do formulario não atualizar
+        document.querySelector('form').addEventListener('submit', event => {
+            //Previne o envio do formulário
+            event.preventDefault();
+
+            //Obtem o valor do input do nome do usuario e da Mensagem
+            const nome = nomeInput.value;
+
+            //Criar um evento chamado chat message - EMIT
+            const mensagem = mensagemInput.value;
+
+            if(nome && mensagem) {
+                socket.emit('chat message', { nome , mensagem , userId: socket.id});
+            }
+
+            //Um metodo chamado trim que remove os espaços em branco do inicio ao fim
+            nome.trim() && mensagem.trim();
+
+            //Limpa o input a mensagem
+            mensagemInput.value = '';
+
+            //Desabilita o input do nome do usuario apos a primeira mensagem
+            nomeInput.disable = true;
+        });
+
+        socket.on("connect", () => {
+            console.log(socket.id)
+            currentUser = socket.id
+        })
+
+        //Adiciona um evento para mensagem recebida do servidor
+        socket.on('chat message', dados => {
+
+            //Cria um elemento de lista para exibir as mensagens
+
+            const lista = document.createElement('li')
+        
+            if(dados.userId === currentUser) {
+                lista.style.textAlign = 'right'
+            }
+            else {
+                lista.style.textAlign = 'left'
+            }
+
+            //Definir o texto da mensagem
+
+            lista.textContent = `${dados.nome}: ${dados.mensagem}`;
+
+            //Adiciona o elemento na lista de mensagens
+            mensagens.appendChild(lista)
+        })
+    </script>
+</body>
+</html>
