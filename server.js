@@ -21,7 +21,7 @@ app.get('/style.css', (request, response) => {
   response.sendFile(path.join(__dirname, "style.css"))
 });
 
-app.get('/login.csss', (request, response) => {
+app.get('/login.css', (request, response) => {
   response.sendFile(path.join(__dirname, "login.css"))
 })
 
